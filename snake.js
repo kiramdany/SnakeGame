@@ -1,10 +1,3 @@
-/*$(function () {
-	snake = [];
-	currentDirection = 'right';
-	loop = function() {};
-	preLoad(80, 100, 7);
-});*/
-
 var resetGame = {
 	//these variables can be adjusted
 	height: 30,
@@ -29,8 +22,6 @@ var resetGame = {
 }
 
 var game = {};
-
-resetGame.preLoad();
 
 function preLoad() {
 	document.removeEventListener('keydown', reset);
@@ -246,3 +237,7 @@ function reset(event) {
 
 	}
 }
+
+$(function () {
+	resetGame.preLoad();
+});
