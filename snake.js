@@ -5,33 +5,41 @@
 	preLoad(80, 100, 7);
 });*/
 
-var game = {
+var resetGame = {
+	//these variables can be adjusted
+	height: 30,
+	width: 24,
+	blockSize: 15,
+	speed: 200,
+	speedIncrease: 0.98,
+	preLoad: preLoad,
+	
+	//these variables store state of the game
 	snake: [],
 	food: [], 
 	snakeSize: 0, 
 	gameHeight: 0,
 	gameWidth: 0,
-	blockSize: 0,
 	currentDirection: 'right',
 	loop: function() {},
 	ctx: undefined,
-	speed: 0,
-	preLoad: preLoad,
 	pause: false,
-	speedIncrease: 0.98
+	score: 0
+	
 }
 
-game.preLoad(30, 24, 7);
+var game = {};
 
-function preLoad(height, width, blockSize) {
-	game.gameHeight = height * blockSize;
-	game.gameWidth = width * blockSize;
-	game.blockSize = blockSize;
+resetGame.preLoad();
+
+function preLoad() {
+	document.removeEventListener('keydown', reset);
+	game = jQuery.extend(true, {}, resetGame)
+	var blockSize = game.blockSize
+	game.gameHeight = game.height * blockSize;
+	game.gameWidth = game.width * blockSize;
 	game.snakeSize = 5;
-	game.speed = 200;
 	
-
-
 	var $game = $("#game");
 	$game.attr({
 		"height": game.gameHeight.toString(),
@@ -53,7 +61,7 @@ function gameLoop() {
 		var eat = collision(game.snake[game.snake.length - 1], game.food)
 		updateSnake(game.currentDirection, game.blockSize, eat);
 		var dead = deadSnake();
-		if (dead) gameOver();
+		
 		
 		if (eat) {
 			positionFood();
@@ -62,6 +70,7 @@ function gameLoop() {
 		}
 		drawSnake(game.snakeSize, game.blockSize, game.ctx);
 		drawFood();
+		if (dead) gameOver();
 	}, game.speed);
 	game.pause = false;
 }
@@ -133,12 +142,16 @@ function deadSnake() {
 }
 	
 function gameOver() {
+	
 	var ctx = game.ctx;
 	pauseSnake();
-	ctx.font = "30px Arial";
+	document.removeEventListener('keydown', keyControls);
+	ctx.font = "12px Arial";
 	ctx.fillStyle = "red";
 	ctx.textAlign = "center";
     ctx.fillText("Game Over",game.gameWidth/2,game.gameHeight/2);
+	ctx.fillText("Push space to reset",game.gameWidth/2,game.gameHeight/2 + 12);
+	document.addEventListener('keydown', reset);
 }
 
 function positionFood() {
@@ -182,9 +195,14 @@ function randomNumber (min, max, increment) {
 	}
 
 function registerControls() {
+	
+	document.addEventListener('keydown', keyControls);
+	
+}
+
+function keyControls(event) {
 	var currentDirection = game.currentDirection;
-	document.addEventListener('keydown', function (event) {
-		switch (event.keyCode) {
+	switch (event.keyCode) {
 		
 		case 37: // Left
 			if (currentDirection === 'left' || currentDirection === 'right') {
@@ -218,6 +236,13 @@ function registerControls() {
 
 		}
 		game.currentDirection = currentDirection;
-	});
-	
+}
+function reset(event) {
+	switch (event.keyCode) {
+
+	case 32: //Space
+		game.preLoad();
+		break;
+
+	}
 }
